@@ -26,13 +26,22 @@ Bear in mind that this is an **exploratory project** - findings should be taken 
 
 Full method and implementation in notebook - Data_Scientist_UK_Q4_Job_market_analysis.ipynb
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Future Steps
+
+1. Improve webscraping process to pick up "Remote work" tags that may be stored sepately on the job website to the main text
+2. Collect more data in 2021 and reiterate project to test current findings
+3. Using feature engineering and regex, for future batches, determine subgroup of jobs that are research-focussed and test again if those roles do correlate with salary. 
+
 
 #### Repo navigation:
 - **index.ipynb** - principal notebook; questions and project plan located there. 
 - **scrape_indeed_gui.py** - script for running Job Scraper Tool (built using pySimpleGui)
 - archive/
 -  cleaning.ipynb - notebook to check the outputs of the scraping tool's results
--  unititled.ipynb - nb used to load and check extraneous data (e.g. ONS salary information for sector)
+-  untitled.ipynb - nb used to load and check extraneous data (e.g. ONS salary information for sector)
+
 -  clean_data/ - folder preprocessed data
 -  raw_data/ folder including data as immediately outputed after webscraping stage
 -  LDA_vis_plot.html - interactive visualisation of Latent Dirichlet Allocation.
@@ -67,11 +76,9 @@ Full method and implementation in notebook - Data_Scientist_UK_Q4_Job_market_ana
 
 #### References:
 
-<!-- * ONS Sector Data - https://www.ons.gov.uk/filters/c60ed96a-df5b-4dbe-bbda-ab407c9639d6/dimensions  -->
 * SlashData Report - 'State of the Developer Nation 19th Edition' - https://slashdata-website-cms.s3.amazonaws.com/sample_reports/y7fzAZ8e5XuKCL1Q.pdf 
-<!-- * Assumptions of Point Biserial Correlation - https://statistics.laerd.com/spss-tutorials/point-biserial-correlation-using-spss-statistics.php -->
-<!-- * Point Biserial Correlation with Python - https://towardsdatascience.com/point-biserial-correlation-with-python-f7cd591bd3b1 -->
-* Assumptions of Ordinal (Linear) Regression
+* Logistic Ordinal Regression - http://fa.bianp.net/blog/2013/logistic-ordinal-regression/
+* pyLDAvis Overview - https://nbviewer.jupyter.org/github/bmabey/pyLDAvis/blob/master/notebooks/pyLDAvis_overview.ipynb
 
 #### Key Assumptions to bear in mind:
 * **Data sourcing** - Data was sourced purely from Indeed.co.uk over a limited time span. The individual time of scraping is recorded for each job post inside the raw_data file raw_data/SE_jobs_20_11_2020.csv. Further sampling over time will be needed to replicate or falsify findings.
