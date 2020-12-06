@@ -9,13 +9,15 @@ Bear in mind that this is an **exploratory project** - findings should be taken 
 2. The median Data Science salary is about £45k; the mean is about £51k
 3. The majority of roles are based in London
 4. The median Data Analyst role is under £40k, whereas the median Data Scientist and Machine Learning jobs are above £60k. Roles with "Scientist" and/or "Machine learning" earn £20k more (**on average**) than roles with "Analyst" in the title. 
-![]()
+
+![](https://github.com/Ioana-P/DS_Indeed_Job_Market_analysis/blob/master/fig/dist_annual_salaries_ALL.jpg)
 
 5. London and Cambridge have the highest average salaries; the former has the widest spread of salaries
 6. If you're a median-salary London Data Analyst, you're getting paid as well as the median salary for all Data Science roles outside the company.
 7. Just over 14% of overall roles are looking for a "Senior" hire. Less than 2% explicitly advertise for a 'Junior' hire. 
 8. The most popular langauges / skills (based on our search) were: Python, SQL, R, AWS and Azure (in decreasing order of mentions). 
-![]()
+
+![](https://github.com/Ioana-P/DS_Indeed_Job_Market_analysis/blob/master/fig/percentage_mentions_by_group.jpg)
 
 9. Using feature engineering and 3 different iterations of models, I was not able to predict salary from job description and title data. This indicates that either more data is needed (likely since there only 274 data points in the training data) or that it's not possible to reliably predict the salary from such data. 
 10. There was insufficient data to determine if years of experience required / requested correlated with annual salary. 
