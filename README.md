@@ -1,4 +1,4 @@
-# Exploring the Software Developer job market through Indeed job posts
+# Exploring the UK Data Science job market through Indeed job posts
 
 I scraped 1098 job posts from Indeed.co.uk, searching for 3 different types of data science roles via the title, and then analysed the data. Please bear in mind that all the data was off one site only (I hope to be able to get job data off LinkedIn/Glassdoor at some point in the future) in late Nov 2020.
 
