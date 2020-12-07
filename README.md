@@ -5,7 +5,7 @@ I scraped 1098 job posts from Indeed.co.uk, searching for 3 different types of d
 Bear in mind that this is an **exploratory project** - findings should be taken with a pinch of salt, and really the results need to be corroborated with a replication of the project in 2021 or with other research. 
 
 ### Findings 
-1. Most Data Science jobs do not advertise their salary openly (only 58.5% do)
+1. Most Data Science jobs do not advertise their salary openly (only 41.5% do)
 2. The median Data Science salary is about £45k; the mean is about £51k
 3. The majority of roles are based in London
 4. The median Data Analyst role is under £40k, whereas the median Data Scientist and Machine Learning jobs are above £60k. Roles with "Scientist" and/or "Machine learning" earn £20k more (**on average**) than roles with "Analyst" in the title. 
