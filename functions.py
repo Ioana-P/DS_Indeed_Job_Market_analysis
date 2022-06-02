@@ -161,6 +161,12 @@ class JobPostScraper:
         start = time.time()
         # empty list to store urls from within the main job posting website
         sub_urls = []
+
+        # defining additional empty lists for the job location and the 
+        # company
+        sub_locs = []
+        sub_comps = []
+
         #init the selenium driver
         chrome_options = Options()
         if headless:
@@ -170,7 +176,7 @@ class JobPostScraper:
     
         # accessing main page
         driver.get(self.root_url)
-        time.sleep(2)
+        # time.sleep(2)
         
         
 #         DEBUGG: website introduced a new popup re consent to data collection practices, that is 
@@ -214,15 +220,26 @@ class JobPostScraper:
             DOM = driver.page_source
             soup = BeautifulSoup(DOM, 'lxml')
             
-            jobtitle_soup = soup.find_all(name='a', 
-                                               attrs= {'class': 'jobtitle turnstileLink', 
-                                                       'data-tn-element':'jobTitle'})
+
+            job_soup = soup.find_all(name='div', 
+                                    attrs = {'class':'job_seen_beacon'})
+
+
+            job_url_title_loc_and_comp = self.get_job_url_title_loc_and_comp(job_soup)
+
             
+            jobtitle_soup = job_url_title_loc_and_comp['job_title_elem']
             # getting href attributes and storing them
             list_hrefs = [jobtitle_elem['href'] for jobtitle_elem in jobtitle_soup]
-            for href in list_hrefs:
+            for i, href in enumerate(list_hrefs):
                 sub_urls.append(href)
                 sub_urls = list(set(list(dict.fromkeys(sub_urls))))
+
+                #after url (most important part) is extracted, then get the loc and comp
+
+                sub_locs.append(self.extract_text_except_na(job_url_title_loc_and_comp['job_loc_elem'][i]))
+                sub_comps.append(self.extract_text_except_na(job_url_title_loc_and_comp['job_comp_elem'][i]))
+
                 if len(sub_urls)>= self.num_jobs:
                     break
 
@@ -234,7 +251,7 @@ class JobPostScraper:
                 pass
 
             # driver waits for the next page button to be viewable before moving and clicking
-            WebDriverWait(driver, 2).until(ec.element_to_be_clickable((By.CLASS_NAME, 'np')))
+            WebDriverWait(driver, 2) #.until(ec.element_to_be_clickable((By.CLASS_NAME, 'np')))
             next_page_buttons = driver.find_elements_by_class_name('np')
             time.sleep(4)
             ActionChains(driver).move_to_element(next_page_buttons[-1]).click().perform()
@@ -257,12 +274,71 @@ class JobPostScraper:
         # Now we take our list of urls, preppend the root url to them and store them in a dataframe
         job_urls_full = list(map(lambda x: str(self.root_url)+x , sub_urls))
         # job_urls_full = list(dict.fromkeys(job_urls_full))
-        job_url_df = pd.DataFrame(job_urls_full, columns=['job_url'])
+        # job_url_df = pd.DataFrame(job_urls_full, columns=['job_url'])
+
+        job_url_df = pd.DataFrame({
+            'job_url': job_urls_full, 
+            'job_location':sub_locs,
+            'company':sub_comps, 
+        }, 
+            index= list(range(len(job_urls_full)))
+            )
         
         self.job_post_urls_ = job_urls_full
         print('URL column successfully stored as pandas obj')
 
         return job_url_df
+
+    def extract_text_except_na(self, elem)->str:
+        if pd.isnull(elem) or elem==np.nan:
+            return np.nan
+        try:
+            text = elem.get_text()
+        except:
+            text = np.NaN
+
+        return text
+
+    def get_job_url_title_loc_and_comp(self,soup:bs4.BeautifulSoup)->dict:
+
+        elem_dict = {}
+        job_title_soup_lst = []
+        job_comp_soup_lst = []
+        job_loc_soup_lst = []
+
+        for mini_soup in soup:
+
+            #get a element with job title and url
+            job_title_soup = mini_soup.find(name='a', 
+                                                attrs= {'class': 'jcs-JobTitle',   #'jobtitle turnstileLink', 
+                                                        #    'data-tn-element':'jobTitle'
+                                                        })
+            try:
+                job_comp_soup = mini_soup.find(name='a', 
+                                            attrs = {'data-tn-element':'companyName'}
+                                                )
+            except:
+                job_comp_soup = np.NaN
+
+
+            try:
+                job_loc_soup = mini_soup.find(name='div', 
+                                            attrs = {'class':'companyLocation'}
+                                                )
+            except:
+                job_loc_soup = np.NaN
+
+            job_title_soup_lst.append(job_title_soup)
+            job_comp_soup_lst.append(job_comp_soup)
+            job_loc_soup_lst.append(job_loc_soup)
+
+
+
+        elem_dict['job_title_elem'] = job_title_soup_lst
+        elem_dict['job_comp_elem'] = job_comp_soup_lst
+        elem_dict['job_loc_elem'] = job_loc_soup_lst
+
+        return elem_dict
     
     
     def get_job_text_html(self,url_df, url_column = 'job_url', headless=True):
@@ -282,7 +358,7 @@ class JobPostScraper:
         else:
             url_list = list(url_df[url_column].values)
             
-
+        
         #init the selenium driver
         chrome_options = Options()
         if headless:
@@ -293,6 +369,7 @@ class JobPostScraper:
         job_descr_list = []
         
         for url in url_list:
+            # print(url)
             driver.get(url)
             time.sleep(5)
             dom =  driver.page_source
@@ -342,14 +419,14 @@ class JobPostScraper:
         extraction from that data
         """
         data = pd.DataFrame({
-                            'company': self.companies_lst_,
+                            'job_url':self.job_post_urls_,
                             'job_title' : self.job_titles_lst_,
                             'job_descr' : self.job_descr_lst_,
                             'job_post_html' : self.job_post_dom_,
                             'time_of_scrape' : self.scrape_asctimes})
         
         data['job_search_term'] = str(self.search_term_job)
-        data['job_location'] = str(self.location)
+        data['job_location_searched_for'] = str(self.location)
         
         return data       
 
@@ -590,17 +667,28 @@ def get_location(text, regex_pattern = '\w[^-]*$'):
         except:
             retrieved_loc = retrieved_loc
             
-    
-    if retrieved_loc[-1] == ' ':
-        retrieved_loc = retrieved_loc[:-1]
+    try:
+        if retrieved_loc[-1] == ' ':
+            retrieved_loc = retrieved_loc[:-1]
+
+    except (IndexError, ValueError):
+        retrieved_loc = np.NaN
+
     return retrieved_loc
 
 def remove_reviews(text, regex_pattern = '[0-9]*[,]*[0-9]* review[s]*'):
-    return re.sub(regex_pattern, '', text)
+    if isinstance(text, str):
+        return re.sub(regex_pattern, '', text)
+    else:
+        return text
 
 def remove_location(text, sep='-'):
-    text_lst = text.split('-')
-    return text_lst[0]
+    if isinstance(text, str):
+        text_lst = text.split('-')
+        return text_lst[0]
+
+    else:
+        return text
 
 def full_clean_and_store(file_path, new_file_name):
     df = pd.read_csv(file_path, index_col=0)
