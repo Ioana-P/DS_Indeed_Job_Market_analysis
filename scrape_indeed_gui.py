@@ -8,7 +8,7 @@ import functions as fn
 import PySimpleGUI as sg 
 import os.path
 import pandas as pd 
-import sqlalchemy as db
+# import sqlalchemy as db
 # import seaborn as sns
 # import matplotlib.pyplot as plt
 
@@ -19,16 +19,16 @@ import sqlalchemy as db
 intro_layout = [[sg.Text("Welcome to the Indeed Job Post Scraper"), sg.Text(size=(40,1))],
                  [sg.Button("Scrape"), sg.Text(size=(15, 1), enable_events=True, key="-SCRAPE-"),
                  ], 
-                 [sg.Button("Retrieve"), sg.Text(size=(15,1), enable_events=True, key="-RETRIEVE-")
-                 ],
+                #  [sg.Button("Retrieve"), sg.Text(size=(15,1), enable_events=True, key="-RETRIEVE-")
+                #  ],
                  [sg.Button("Clean"), sg.Text(size=(15,1), enable_events=True, key='-CLEAN-')
                  ],
                  [sg.Button("Close")]
                  ]
 # window for scraping menu, allowing you to enter the webscraping details- e.g. what job you'd like to search for
 scrape_layout = [[sg.Text("Scrape job data", (20,3)), sg.Text(size=(40,1))],
-                [sg.Text("Search term", (20,1)), sg.In(size=(30,1), enable_events=True, key='-SEARCH-TERM-')],
-                [sg.Text("Location", (20,1)), sg.In('London', size=(30,1), enable_events=True, key='-SEARCH-LOCATION-')],
+                [sg.Text("Search term", (20,1)), sg.In('title:(data,scientist)', size=(30,1), enable_events=True, key='-SEARCH-TERM-')],
+                [sg.Text("Location", (20,1)), sg.In('', size=(30,1), enable_events=True, key='-SEARCH-LOCATION-')],
                 [sg.Text("Website URL", (20,1)), sg.In('https://www.indeed.co.uk', (30,1), enable_events=True, key='-ROOT-URL-')],                # [sg.Button("Go back"), sg.Text(size=(10,1), enable_events=True, key="-GO-BACK-")],
                 [sg.Text("How many jobs?", (20,1)), sg.In('10', (5,1), enable_events=True, key='-NUM-JOBS-')],
                 [sg.Text("Save as (filename)", (20,1)), sg.In('scraped_jobs_data', (30,1), enable_events=True, key='-FILENAME-')],
@@ -115,11 +115,18 @@ while True:
         job_url_df = job_scraper.get_job_link_urls(headless=False)
         job_scraper.get_job_text_html(job_url_df, headless=True)
         new_jobs_df = job_scraper.get_jobs_df()
+        #merge with previous url_df to keep location and company as saved from initial search
+        new_jobs_df = job_url_df.merge(new_jobs_df, on = ['job_url'], suffixes=('' , '_RIGHT'))
+        drop_cols = [x for x in new_jobs_df.columns if x.endswith('_RIGHT')]
+        # print("\n\t", "DROP COLS: ", drop_cols, "\n\t",)
+        new_jobs_df.drop(columns = drop_cols, inplace=True,)
+
         current_time = time.asctime()
         current_time = pd.to_datetime(current_time)
         current_date = str(current_time)[:10].replace('-', '_')
         filename = scrape_dict['file_name']+'_'+current_date
-        new_jobs_df.to_csv(f'{filename}.csv', columns = new_jobs_df.columns)
+        new_jobs_df.drop(columns=[x for x in new_jobs_df if x.startswith('Unnamed:')], inplacae=True)
+        new_jobs_df.to_csv('/'.join(['raw_data', f'{filename}.csv']), columns = new_jobs_df.columns)
         print("Scraping job done!")
         print("Example rows of your newly scraped data:")
         print(new_jobs_df.head())

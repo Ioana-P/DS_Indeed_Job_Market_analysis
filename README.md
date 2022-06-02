@@ -2,7 +2,12 @@
 
 I scraped 1082 job posts from Indeed.co.uk, searching for 3 different types of data science roles via the title, and then analysed the data. Please bear in mind that all the data was off one site only (I hope to be able to get job data off LinkedIn/Glassdoor at some point in the future) in late Nov 2020.
 
-Bear in mind that this is an **exploratory project** - findings should be taken with a pinch of salt, and really the results need to be corroborated with a replication of the project in 2021 or with other research. 
+Bear in mind that this is an **exploratory project** - findings should be taken with a pinch of salt, and really the results need to be corroborated with a ~~replication of the project in 2021 or with other research. ~~ 
+Update 01/06/2022:
+The scraping code has been updated again and tested on a small sample (n=10) of jobs with the search term title:(data,scientist). 
+
+* Location is now taken directly from the search results page, which seems to be returning more locations than the alternative as it is a more easily identifiable element
+* "Retrieve" has been removed from the GUI options. This was originally intended for the purpose of retrieving historical data from an SQLite db, but I've mothballed that idea now since it didn't give enough clear benefits. 
 
 ### Findings 
 1. Most Data Science jobs do not advertise their salary openly (only 41.5% do)
